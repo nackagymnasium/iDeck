@@ -30,7 +30,15 @@
       "node_modules/**/*"
     ],
     "win": {
-      "target": "dir"
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "iDeck-v${version}-portable.exe"
     },
     "extraMetadata": {
       "main": "main.js"
