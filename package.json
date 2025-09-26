@@ -30,6 +30,7 @@
       "node_modules/**/*"
     ],
     "win": {
+      "icon": "icon.ico",
       "target": [
         {
           "target": "portable",
