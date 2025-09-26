@@ -1,0 +1,49 @@
+{
+  "name": "ideck",
+  "version": "1.0.3",
+  "description": "A StreamDeck alternative that runs as a web app on your phone",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never",
+    "pack": "electron-builder --dir"
+  },
+  "keywords": [
+    "streamdeck",
+    "remote",
+    "control",
+    "pwa"
+  ],
+  "author": "iDeck Developer",
+  "license": "MIT",
+  "build": {
+    "appId": "com.ideck.app",
+    "productName": "iDeck",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "server.js",
+      "public/**/*",
+      "node_modules/**/*"
+    ],
+    "win": {
+      "target": "dir"
+    },
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "forceCodeSigning": false
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-global-key-listener": "^0.1.1",
+    "socket.io": "^2.4.1"
+  },
+  "devDependencies": {
+    "electron": "^13.6.9",
+    "electron-builder": "^26.0.12"
+  }
+}

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>iDeck</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <!-- PWA support -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="iDeck">
+    <link rel="apple-touch-icon" href="images/icon-192x192.png">
+    <meta name="theme-color" content="#2c2c2c">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>iDeck</h1>
+            <div class="page-navigation">
+                <button id="prev-page" class="nav-button">◀</button>
+                <span id="page-indicator">Page 1 of 1</span>
+                <button id="next-page" class="nav-button">▶</button>
+                <button id="add-page" class="nav-button">+</button>
+                <button id="delete-page" class="nav-button delete-btn">🗑️</button>
+            </div>
+            <div class="profile-selector">
+                <select id="profile-select">
+                    <option value="default">Default Profile</option>
+                </select>
+            </div>
+            <div class="connection-status">
+                <span id="status-indicator"></span>
+                <span id="status-text">Disconnected</span>
+                <button id="settings-toggle">⚙️</button>
+            </div>
+        </header>
+        
+        <div class="deck-grid" id="deck-grid">
+            <!-- Buttons will be dynamically generated here -->
+        </div>
+        
+        <div class="settings-panel" id="settings-panel">
+            <div class="settings-header">
+                <h2>⚙️ Settings</h2>
+                <button id="exit-settings" class="exit-button">✕</button>
+            </div>
+            
+            <!-- Profile Management Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>👤 Profile Management</h3>
+                    <p class="section-description">Manage your button profiles and configurations</p>
+                </div>
+                <div class="profile-controls">
+                    <div class="form-group">
+                        <label for="profile-select-settings">Current Profile:</label>
+                        <select id="profile-select-settings">
+                            <option value="default">Default Profile</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="profile-name">New Profile Name:</label>
+                        <input type="text" id="profile-name" placeholder="Enter profile name">
+                    </div>
+                    <div class="profile-actions">
+                        <button id="create-profile" class="action-btn add-btn">➕ Create Profile</button>
+                        <button id="duplicate-profile" class="action-btn">📋 Duplicate Current</button>
+                        <button id="delete-profile" class="action-btn remove-btn">🗑️ Delete Profile</button>
+                    </div>
+                    <div class="existing-profiles">
+                        <h4>Existing Profiles:</h4>
+                        <div id="profile-list"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Grid Configuration Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>📐 Grid Size</h3>
+                    <p class="section-description">Set how many buttons fit on your deck</p>
+                </div>
+                <div class="grid-controls">
+                    <div class="form-group inline">
+                        <label for="rows">Rows:</label>
+                        <input type="number" id="rows" min="1" max="8" value="3">
+                    </div>
+                    <div class="form-group inline">
+                        <label for="columns">Columns:</label>
+                        <input type="number" id="columns" min="1" max="8" value="4">
+                    </div>
+                    <button id="apply-grid" class="primary-btn">Apply Changes</button>
+                </div>
+            </div>
+            
+            <!-- Button Management Section -->
+            <div class="settings-section">
+                <div class="section-header">
+                    <h3>🎛️ Button Management</h3>
+                    <p class="section-description">Add, remove, or customize your buttons</p>
+                </div>
+                <div class="button-management">
+                    <button id="add-button" class="action-btn add-btn">➕ Add New Button</button>
+                    <button id="edit-layout" class="action-btn edit-btn">✏️ Edit Layout</button>
+                    <button id="remove-button" class="action-btn remove-btn">🗑️ Remove Buttons</button>
+                </div>
+                <div class="info-box" style="margin-top: 15px;">
+                    <p><strong>📱 Mobile Tip:</strong> Long press any button to edit it directly!</p>
+                    <p><a href="help-mobile.html" target="_blank" style="color: #3498db;">View Mobile Help Guide →</a></p>
+                </div>
+                <div class="layout-mode-info" id="layout-mode-info" style="display: none;">
+                    <div class="info-box">
+                        <p>📝 <strong>Edit Mode:</strong> Click on buttons to select/deselect them</p>
+                        <button id="exit-layout-mode" class="primary-btn">✅ Done Editing</button>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Button Editor (Independent) -->
+        <div class="button-editor" id="button-editor" style="display: none;">
+            <div class="editor-header">
+                <h3>✏️ Button Setup</h3>
+                <p class="editor-description">Configure your new button</p>
+            </div>
+            
+            <!-- Basic Settings -->
+            <div class="editor-section">
+                <h4>Basic Info</h4>
+                <div class="form-group">
+                    <label for="button-name">Button Name:</label>
+                    <input type="text" id="button-name" placeholder="Enter button name">
+                </div>
+                <div class="form-group">
+                    <label for="button-icon">Button Icon:</label>
+                    <div class="icon-selector">
+                        <div class="selected-icon" id="selected-icon">
+                            <span class="icon-display" id="icon-display">🎯</span>
+                            <span class="icon-name" id="icon-name">No Icon</span>
+                        </div>
+                        <button type="button" id="choose-icon-btn" class="choose-icon-btn">Choose Icon</button>
+                        <button type="button" id="remove-icon-btn" class="remove-icon-btn" style="display: none;">Remove</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="button-color">Button Color:</label>
+                    <input type="color" id="button-color" value="#3498db">
+                </div>
+            </div>
+            
+            <!-- Action Type -->
+            <div class="editor-section">
+                <h4>What should this button do?</h4>
+                <div class="command-type-grid">
+                    <label class="command-option" data-type="shell">
+                        <input type="radio" name="command-type" value="shell" checked>
+                        <div class="option-card">
+                            <span class="option-icon">💻</span>
+                            <span class="option-title">Run Command</span>
+                            <span class="option-desc">Execute shell commands</span>
+                        </div>
+                    </label>
+                    <label class="command-option" data-type="keypress">
+                        <input type="radio" name="command-type" value="keypress">
+                        <div class="option-card">
+                            <span class="option-icon">⌨️</span>
+                            <span class="option-title">Key Shortcut</span>
+                            <span class="option-desc">Send keyboard shortcuts</span>
+                        </div>
+                    </label>
+                    <label class="command-option" data-type="media">
+                        <input type="radio" name="command-type" value="media">
+                        <div class="option-card">
+                            <span class="option-icon">🎵</span>
+                            <span class="option-title">Media Control</span>
+                            <span class="option-desc">Control music/video</span>
+                        </div>
+                    </label>
+                    <label class="command-option" data-type="app">
+                        <input type="radio" name="command-type" value="app">
+                        <div class="option-card">
+                            <span class="option-icon">🚀</span>
+                            <span class="option-title">Launch App</span>
+                            <span class="option-desc">Open applications</span>
+                        </div>
+                    </label>
+                    <label class="command-option" data-type="folder">
+                        <input type="radio" name="command-type" value="folder">
+                        <div class="option-card">
+                            <span class="option-icon">📁</span>
+                            <span class="option-title">Switch Page</span>
+                            <span class="option-desc">Navigate to another page</span>
+                        </div>
+                    </label>
+                    <label class="command-option" data-type="system">
+                        <input type="radio" name="command-type" value="system">
+                        <div class="option-card">
+                            <span class="option-icon">📊</span>
+                            <span class="option-title">System Info</span>
+                            <span class="option-desc">Show system stats</span>
+                        </div>
+                    </label>
+                    <label class="command-option" data-type="timer">
+                        <input type="radio" name="command-type" value="timer">
+                        <div class="option-card">
+                            <span class="option-icon">⏱️</span>
+                            <span class="option-title">Timer</span>
+                            <span class="option-desc">Stopwatch or countdown</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            
+            <!-- Command-specific settings -->
+            <div class="editor-section command-settings">
+                <div class="form-group" id="shell-command-group">
+                    <label for="shell-command">Command to run:</label>
+                    <input type="text" id="shell-command" placeholder="e.g. notepad.exe">
+                    <small class="help-text">Enter the command or program you want to execute</small>
+                </div>
+                
+                <div class="form-group" id="keypress-group" style="display: none;">
+                    <label for="key-combination">Key combination:</label>
+                    <input type="text" id="key-combination" placeholder="e.g. ctrl+shift+t">
+                    <small class="help-text">Use + to combine keys (ctrl, shift, alt, etc.)</small>
+                </div>
+                
+                <div class="form-group" id="media-control-group" style="display: none;">
+                    <label for="media-action">Media action:</label>
+                    <select id="media-action">
+                        <option value="play">Play/Pause</option>
+                        <option value="stop">Stop</option>
+                        <option value="prev">Previous Track</option>
+                        <option value="next">Next Track</option>
+                        <option value="volup">Volume Up</option>
+                        <option value="voldown">Volume Down</option>
+                        <option value="mute">Mute/Unmute</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="folder-group" style="display: none;">
+                    <label for="folder-target">Target page:</label>
+                    <select id="folder-target">
+                        <option value="1">Page 1</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="app-group" style="display: none;">
+                    <label for="app-path">Application path:</label>
+                    <input type="text" id="app-path" placeholder="e.g. C:\Program Files\App\app.exe">
+                    <label for="app-args">Arguments (optional):</label>
+                    <input type="text" id="app-args" placeholder="e.g. --fullscreen">
+                    <small class="help-text">Browse to find your application's .exe file</small>
+                </div>
+                
+                <div class="form-group" id="system-group" style="display: none;">
+                    <label for="system-metric">System metric to display:</label>
+                    <select id="system-metric">
+                        <option value="cpu">CPU Usage</option>
+                        <option value="memory">Memory Usage</option>
+                        <option value="network">Network Activity</option>
+                        <option value="disk">Disk Usage</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="timer-group" style="display: none;">
+                    <label for="timer-type">Timer type:</label>
+                    <select id="timer-type">
+                        <option value="stopwatch">Stopwatch</option>
+                        <option value="countdown">Countdown Timer</option>
+                    </select>
+                    <div id="countdown-settings" style="display: none;">
+                        <label for="countdown-minutes">Minutes:</label>
+                        <input type="number" id="countdown-minutes" min="0" max="59" value="5">
+                        <label for="countdown-seconds">Seconds:</label>
+                        <input type="number" id="countdown-seconds" min="0" max="59" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-actions">
+                <button id="save-button" class="primary-btn">💾 Save Button</button>
+                <button id="cancel-button" class="secondary-btn">❌ Cancel</button>
+            </div>
+        </div>
+        
+        <!-- Icon Picker Modal -->
+        <div class="icon-picker-modal" id="icon-picker-modal" style="display: none;">
+            <div class="icon-picker-content">
+                <div class="icon-picker-header">
+                    <h3>🎨 Choose an Icon</h3>
+                    <button id="close-icon-picker" class="close-btn">✕</button>
+                </div>
+                
+                <div class="icon-search">
+                    <input type="text" id="icon-search-input" placeholder="Search icons..." autocomplete="off">
+                </div>
+                
+                <div class="icon-categories">
+                    <button class="category-btn active" data-category="all">All</button>
+                    <button class="category-btn" data-category="system">System</button>
+                    <button class="category-btn" data-category="media">Media</button>
+                    <button class="category-btn" data-category="files">Files</button>
+                    <button class="category-btn" data-category="communication">Communication</button>
+                    <button class="category-btn" data-category="navigation">Navigation</button>
+                    <button class="category-btn" data-category="gaming">Gaming</button>
+                    <button class="category-btn" data-category="applications">Apps</button>
+                    <button class="category-btn" data-category="symbols">Symbols</button>
+                </div>
+                
+                <div class="icon-grid" id="icon-grid">
+                    <!-- Icons will be populated here -->
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+        </footer>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/pwa.js"></script>
+</body>
+</html>
